@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lab1/utilits/global_vars.dart';
 import 'package:flutter/src/material/icons.dart';
+import 'package:flutter_lab1/post.dart';
+import 'package:flutter_lab1/story.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (_) => CountLikes(),
+    child: MyApp(),
+  )
+      // const MyApp()
+      );
 }
 
 class MyApp extends StatelessWidget {
@@ -31,7 +39,6 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-bool is_hero = false;
 double set_w(int w) => GlobalVars.screenWidth * w / 100;
 double set_h(int h) => GlobalVars.screenHeight * h / 100;
 
@@ -41,28 +48,7 @@ List get_stories(Function s_s) {
     stories.add(SizedBox(
       width: set_w(2),
     ));
-    stories.add(Material(
-      elevation: 4.0,
-      shape: CircleBorder(),
-      clipBehavior: Clip.hardEdge,
-      color: Colors.transparent,
-      child: Hero(
-        tag: 'story',
-        child: Ink.image(
-          image: AssetImage('assets/all.jpeg'),
-          fit: BoxFit.cover,
-          width: set_h(10),
-          height: set_h(10),
-          child: InkWell(
-            onTap: () {
-              s_s(() {
-                is_hero = true;
-              });
-            },
-          ),
-        ),
-      ),
-    ));
+    stories.add(Story());
     stories.add(SizedBox(
       width: set_w(2),
     ));
@@ -70,92 +56,26 @@ List get_stories(Function s_s) {
   return stories;
 }
 
-List get_posts() {
+List get_posts(BuildContext context) {
   List posts = [];
   for (var i = 0; i < 5; i++) {
-    posts.add(Container(
-      child: Column(
+    posts.add(Post(i));
+    posts.add(
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Material(
-                elevation: 4.0,
-                shape: CircleBorder(),
-                clipBehavior: Clip.hardEdge,
-                color: Colors.transparent,
-                child: Ink.image(
-                  image: AssetImage('assets/all.jpeg'),
-                  fit: BoxFit.cover,
-                  width: set_h(5),
-                  height: set_h(5),
-                  child: InkWell(
-                    onTap: () {},
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: set_w(2),
-              ),
-              Text(
-                "Cool_cat_777",
-                style:
-                    TextStyle(fontSize: set_h(3), fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
           SizedBox(
-            height: set_h(2),
+            width: set_w(2),
           ),
-          Image(
-            image: AssetImage('assets/all.jpeg'),
-            width: set_w(98),
-            height: set_h(30),
-          ),
-          SizedBox(
-            height: set_h(1),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.icecream,
-                        color: Colors.pink[100],
-                        size: set_h(3),
-                      )),
-                  IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.comment,
-                        color: Colors.black,
-                        size: set_h(3),
-                      )),
-                  IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.send,
-                        color: Colors.black,
-                        size: set_h(3),
-                      ))
-                ],
-              ),
-              IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.bookmark,
-                    color: Colors.black,
-                    size: set_h(3),
-                  ))
-            ],
-          ),
-          SizedBox(
-            height: set_h(4),
+          Text(
+            '${Provider.of<CountLikes>(context).likes[i][0]} likes',
+            style: TextStyle(fontSize: set_h(3), fontWeight: FontWeight.bold),
           ),
         ],
       ),
+    );
+    posts.add(SizedBox(
+      height: set_h(5),
     ));
   }
   return posts;
@@ -217,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ))
         ],
       ),
-      body: is_hero
+      body: GlobalVars.is_hero
           ? Container(
               child: IconButton(
               icon: Hero(
@@ -229,7 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
               iconSize: set_w(95),
               onPressed: () {
                 setState(() {
-                  is_hero = false;
+                  GlobalVars.is_hero = false;
                 });
               },
             ))
@@ -255,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(
                     height: set_h(2),
                   ),
-                  ...get_posts(),
+                  ...get_posts(context),
                 ],
               )),
             ),
